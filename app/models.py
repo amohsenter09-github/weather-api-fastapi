@@ -22,7 +22,7 @@ class Temperature(BaseModel):
 class Wind(BaseModel):
     """Wind information."""
     speed: float
-    deg: int
+    deg: Optional[int] = None
 
 
 class Coordinates(BaseModel):

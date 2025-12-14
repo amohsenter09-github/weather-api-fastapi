@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 import requests
 
@@ -30,7 +30,7 @@ async def health_check():
     """Health check endpoint."""
     return {
         "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -90,7 +90,7 @@ async def get_current_weather(
             ],
             wind=Wind(
                 speed=data["wind"]["speed"],
-                deg=data["wind"]["deg"]
+                deg=data["wind"].get("deg")
             ),
             visibility=data.get("visibility", 0),
             timestamp=data["dt"]
@@ -160,7 +160,7 @@ async def get_weather_forecast(
                     ],
                     wind=Wind(
                         speed=item["wind"]["speed"],
-                        deg=item["wind"]["deg"]
+                        deg=item["wind"].get("deg")
                     )
                 )
             )
