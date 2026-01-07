@@ -46,3 +46,63 @@ Open API docs at `http://localhost:8000/docs`.
 ```bash
 docker compose up --build
 ```
+
+## Kubernetes (kind)
+
+### Option A (recommended): Ingress on host ports 80/443 (no port-forward)
+
+This repo includes `kind-ingress-config.yaml` which creates a kind cluster with port mappings so you can use:
+- `http://weather-api.local/health`
+- `http://weather-api.local/weather?city=Berlin`
+- `http://weather-api.local/docs`
+
+1. (Re)create the kind cluster:
+
+```bash
+kind delete cluster --name local-cluster
+kind create cluster --name local-cluster --config kind-ingress-config.yaml
+```
+
+2. Set context:
+
+```bash
+kubectl config use-context kind-local-cluster
+```
+
+3. Install ingress-nginx:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+kubectl -n ingress-nginx wait --for=condition=Ready pod -l app.kubernetes.io/component=controller --timeout=180s
+```
+
+4. Apply manifests:
+
+```bash
+kubectl apply -k k8s/
+```
+
+5. Verify:
+
+```bash
+kubectl -n weather-api get pods,svc,ing
+```
+
+6. Add host entry (macOS):
+
+```bash
+sudo sh -c 'echo "127.0.0.1 weather-api.local" >> /etc/hosts'
+```
+
+### Option B: Port-forward (works even without host port mappings)
+
+If you have an ingress controller but your kind cluster does not expose ports 80/443, port-forward the controller:
+
+```bash
+kubectl -n ingress-nginx port-forward svc/ingress-nginx-controller 8080:80
+```
+
+Then use (and ensure `weather-api.local` is in `/etc/hosts`):
+- `http://weather-api.local:8080/health`
+- `http://weather-api.local:8080/weather?city=Berlin`
+- `http://weather-api.local:8080/docs`
