@@ -43,3 +43,5 @@ async def get_weather(
     except Exception as e:
         raise HTTPException(status_code=502, detail="Upstream weather provider error") from e
 
+
+
