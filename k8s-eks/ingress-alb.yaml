@@ -9,6 +9,11 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-path: /health
     alb.ingress.kubernetes.io/success-codes: "200"
+    # HTTPS listener + cert (ACM must be in the same region as the ALB)
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:918780499156:certificate/9221f234-7a4e-4ab8-a192-442d486a1fb9
+    # Redirect all HTTP (80) to HTTPS (443)
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
     # ExternalDNS (Route53) - creates/updates the DNS record automatically
     external-dns.alpha.kubernetes.io/hostname: weather.infra-ai-art.delivery
 spec:
