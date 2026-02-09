@@ -113,11 +113,11 @@ Then:
 If your cluster has the ExternalDNS addon and you control a Route53 hosted zone (example: `cloud-master-ai.com`),
 the Ingress can request a record like:
 
-- `weather.cloud-master-ai.com`
+- `origin-weather.cloud-master-ai.com`
 
 This repo’s `k8s-eks/ingress-alb.yaml` includes:
-- `spec.rules[].host: weather.cloud-master-ai.com`
-- `external-dns.alpha.kubernetes.io/hostname: weather.cloud-master-ai.com`
+- `spec.rules[].host: origin-weather.cloud-master-ai.com`
+- `external-dns.alpha.kubernetes.io/hostname: origin-weather.cloud-master-ai.com`
 
 Verify:
 

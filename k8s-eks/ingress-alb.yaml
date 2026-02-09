@@ -15,11 +15,11 @@ metadata:
     # Redirect all HTTP (80) to HTTPS (443)
     alb.ingress.kubernetes.io/ssl-redirect: "443"
     # ExternalDNS (Route53) - creates/updates the DNS record automatically
-    external-dns.alpha.kubernetes.io/hostname: weather.cloud-master-ai.com
+    external-dns.alpha.kubernetes.io/hostname: origin-weather.cloud-master-ai.com
 spec:
   ingressClassName: alb
   rules:
-    - host: weather.cloud-master-ai.com
+    - host: origin-weather.cloud-master-ai.com
       http:
         paths:
           - path: /
