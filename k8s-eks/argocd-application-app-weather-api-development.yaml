@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-weather-api
+  name: app-weather-api-development
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,10 +10,10 @@ spec:
   source:
     repoURL: git@github.com:amohsenter09-github/weather-api-fastapi.git
     targetRevision: master
-    path: k8s-eks/overlays/production
+    path: k8s-eks/overlays/development
   destination:
     server: https://kubernetes.default.svc
-    namespace: weather-api
+    namespace: weather-api-development
   syncPolicy:
     automated:
       prune: true

@@ -1,0 +1,7 @@
+ - op: replace
+   path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
+   value: origin-weather-dev.cloud-master-ai.com
+ - op: replace
+   path: /spec/rules/0/host
+   value: origin-weather-dev.cloud-master-ai.com
+
