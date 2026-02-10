@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: development
   source:
     repoURL: git@github.com:amohsenter09-github/weather-api-fastapi.git
     targetRevision: master
