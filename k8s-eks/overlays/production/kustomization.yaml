@@ -8,3 +8,11 @@ resources:
 # All namespaced resources from the base will be deployed into this namespace
 namespace: weather-api
 
+patchesJson6902:
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: weather-api
+    path: ingress-group.patch.yaml
+
