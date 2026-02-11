@@ -6,4 +6,6 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress-alb.yaml
+  - networkpolicy-egress.yaml
+  - networkpolicy-ingress.yaml
 
