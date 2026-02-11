@@ -84,14 +84,14 @@ kubectl get nodes
 
 ### Configure the image
 
-Edit `k8s-eks/base/deployment.yaml` and set:
+Edit `api-fastapi/base/deployment.yaml` and set:
 
 - `image: <your-ecr-repo-uri>:<tag>`
 
 ### Apply manifests
 
 ```bash
-kubectl apply -k k8s-eks/overlays/production
+kubectl apply -k api-fastapi/overlays/production
 kubectl -n weather-api get pods,svc,ingress
 ```
 
@@ -115,7 +115,7 @@ the Ingress can request a record like:
 
 - `origin-weather.cloud-master-ai.com`
 
-This repo’s `k8s-eks/base/ingress-alb.yaml` includes:
+This repo’s `api-fastapi/base/ingress-alb.yaml` includes:
 - `spec.rules[].host: origin-weather.cloud-master-ai.com`
 - `external-dns.alpha.kubernetes.io/hostname: origin-weather.cloud-master-ai.com`
 
@@ -128,7 +128,7 @@ kubectl -n weather-api get ingress weather-api -o jsonpath='{.status.loadBalance
 
 ## 3) ALB Ingress: recommended annotations
 
-This repo includes an example ALB Ingress at `k8s-eks/base/ingress-alb.yaml` using:
+This repo includes an example ALB Ingress at `api-fastapi/base/ingress-alb.yaml` using:
 
 - internet-facing ALB
 - target-type `ip`
@@ -137,7 +137,7 @@ This repo includes an example ALB Ingress at `k8s-eks/base/ingress-alb.yaml` usi
 
 ### Enable HTTPS on the ALB
 
-Add to `k8s-eks/base/ingress-alb.yaml`:
+Add to `api-fastapi/base/ingress-alb.yaml`:
 
 - `alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'`
 - `alb.ingress.kubernetes.io/certificate-arn: <acm-arn-in-your-region>`
@@ -225,4 +225,4 @@ Your node is at its **max pod capacity** (common on small instance types).
 
 Fix:
 - Scale your nodegroup to **2+ nodes**, or use a larger instance type.
-- Then you can increase `spec.replicas` in `k8s-eks/base/deployment.yaml`.
+- Then you can increase `spec.replicas` in `api-fastapi/base/deployment.yaml`.
