@@ -12,7 +12,7 @@ metadata:
     alb.ingress.kubernetes.io/success-codes: "200"
 
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:918780499156:certificate/589630d4-3d47-4f4d-9fb2-ad2cbf586011
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:918780499156:certificate/df2a7f48-c4a9-451b-a838-43e311219e67
     alb.ingress.kubernetes.io/ssl-redirect: "443"
 
     external-dns.alpha.kubernetes.io/hostname: origin-weather.cloud-master-ai.com

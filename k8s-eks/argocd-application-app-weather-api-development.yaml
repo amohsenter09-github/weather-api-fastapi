@@ -8,7 +8,7 @@ metadata:
 spec:
   project: development
   source:
-    repoURL: git@github.com:amohsenter09-github/weather-api-fastapi.git
+    repoURL: https://github.com/amohsenter09-github/weather-api-fastapi.git
     targetRevision: master
     path: k8s-eks/overlays/development
   destination:
