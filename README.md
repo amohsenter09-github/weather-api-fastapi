@@ -94,6 +94,16 @@ kubectl -n weather-api get pods,svc,ing
 sudo sh -c 'echo "127.0.0.1 weather-api.local" >> /etc/hosts'
 ```
 
+### Local image workflow (kind)
+
+If you want to build the Docker image locally (fast iteration), use the kind overlay:
+
+```bash
+docker build -t weather-api-fastapi:local .
+kind load docker-image weather-api-fastapi:local --name local-cluster
+kubectl apply -k k8s-kind/
+```
+
 ### Option B: Port-forward (works even without host port mappings)
 
 If you have an ingress controller but your kind cluster does not expose ports 80/443, port-forward the controller:

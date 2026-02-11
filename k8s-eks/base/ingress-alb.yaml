@@ -17,8 +17,6 @@ metadata:
 
     external-dns.alpha.kubernetes.io/hostname: origin-weather.cloud-master-ai.com
 
-    # CloudFront-only lockdown (from Terraform output alb_cloudfront_only_security_group_id)
-    alb.ingress.kubernetes.io/security-groups: sg-03282d61a563152d4
     alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
 spec:
   ingressClassName: alb
