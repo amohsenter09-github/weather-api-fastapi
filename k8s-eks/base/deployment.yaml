@@ -30,17 +30,9 @@ spec:
           ports:
             - name: http
               containerPort: 8000
-          env:
-            - name: APP_NAME
-              value: weather-api-fastapi
-            - name: LOG_LEVEL
-              value: INFO
-            - name: OPEN_METEO_BASE_URL
-              value: https://api.open-meteo.com/v1
-            - name: OPEN_METEO_GEOCODING_BASE_URL
-              value: https://geocoding-api.open-meteo.com/v1
-            - name: HTTP_TIMEOUT_SECONDS
-              value: "10"
+          envFrom:
+            - configMapRef:
+                name: weather-api
           readinessProbe:
             httpGet:
               path: /health
