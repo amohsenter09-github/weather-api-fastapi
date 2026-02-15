@@ -8,3 +8,6 @@ resources:
   - ingress-alb.yaml
   - networkpolicy-egress.yaml
   - networkpolicy-ingress.yaml
+  - serviceaccount.yaml
+  - rbac-role.yaml
+  - rbac-rolebinding.yaml

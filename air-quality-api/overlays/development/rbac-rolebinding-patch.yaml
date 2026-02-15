@@ -1,0 +1,8 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: air-quality-api
+subjects:
+  - kind: ServiceAccount
+    name: air-quality-api
+    namespace: air-quality-api-development

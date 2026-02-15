@@ -15,4 +15,16 @@ patches:
       kind: Ingress
       name: weather-api
     path: ingress-hostname.patch.yaml
+  - target:
+      group: rbac.authorization.k8s.io
+      version: v1
+      kind: RoleBinding
+      name: weather-api
+    path: rbac-rolebinding-patch.yaml
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: NetworkPolicy
+      name: weather-api-ingress
+    path: networkpolicy-ingress-patch.yaml
 

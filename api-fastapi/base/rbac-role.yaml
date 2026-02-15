@@ -1,0 +1,8 @@
+# Minimal Role: no k8s API access for app pods (defense in depth)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: weather-api
+  labels:
+    app: weather-api
+rules: []  # No permissions - app doesn't need k8s API access

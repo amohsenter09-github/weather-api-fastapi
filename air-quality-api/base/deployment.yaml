@@ -19,6 +19,7 @@ spec:
       labels:
         app: air-quality-api
     spec:
+      serviceAccountName: air-quality-api
       containers:
         - name: air-quality-api
           image: 918780499156.dkr.ecr.eu-west-1.amazonaws.com/air-quality-platform:latest

@@ -14,3 +14,15 @@ patches:
       kind: Ingress
       name: air-quality-api
     path: ingress-hostname.patch.yaml
+  - target:
+      group: rbac.authorization.k8s.io
+      version: v1
+      kind: RoleBinding
+      name: air-quality-api
+    path: rbac-rolebinding-patch.yaml
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: NetworkPolicy
+      name: air-quality-api-ingress
+    path: networkpolicy-ingress-patch.yaml
