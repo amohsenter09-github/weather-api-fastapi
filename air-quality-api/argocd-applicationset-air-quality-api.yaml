@@ -8,14 +8,17 @@ spec:
     - list:
         elements:
           - env: development
+            server: https://kubernetes.default.svc
             path: air-quality-api/overlays/development
             namespace: air-quality-api-development
             project: development
           - env: uat
+            server: https://kubernetes.default.svc
             path: air-quality-api/overlays/uat
             namespace: air-quality-api-uat
             project: uat
           - env: production
+            server: https://kubernetes.default.svc
             path: air-quality-api/overlays/production
             namespace: air-quality-api
             project: production
@@ -29,7 +32,7 @@ spec:
         targetRevision: master
         path: '{{path}}'
       destination:
-        server: https://kubernetes.default.svc
+        server: '{{server}}'
         namespace: '{{namespace}}'
       syncPolicy:
         automated:
