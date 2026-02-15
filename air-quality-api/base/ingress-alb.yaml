@@ -3,7 +3,8 @@ kind: Ingress
 metadata:
   name: air-quality-api
   annotations:
-    alb.ingress.kubernetes.io/group.name: weather-api
+    # Group name is overridden per overlay for one ALB per environment.
+    alb.ingress.kubernetes.io/group.name: platform-prod
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-path: /health

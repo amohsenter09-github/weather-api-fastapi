@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: weather-api
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: development
+            path: api-fastapi/overlays/development
+            namespace: weather-api-development
+            project: development
+          - env: uat
+            path: api-fastapi/overlays/uat
+            namespace: weather-api-uat
+            project: uat
+          - env: production
+            path: api-fastapi/overlays/production
+            namespace: weather-api
+            project: production
+  template:
+    metadata:
+      name: 'weather-api-{{env}}'
+    spec:
+      project: '{{project}}'
+      source:
+        repoURL: https://github.com/amohsenter09-github/weather-api-fastapi.git
+        targetRevision: master
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

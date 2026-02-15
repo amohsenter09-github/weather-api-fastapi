@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: air-quality-api
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: development
+            path: air-quality-api/overlays/development
+            namespace: air-quality-api-development
+            project: development
+          - env: uat
+            path: air-quality-api/overlays/uat
+            namespace: air-quality-api-uat
+            project: uat
+          - env: production
+            path: air-quality-api/overlays/production
+            namespace: air-quality-api
+            project: production
+  template:
+    metadata:
+      name: 'air-quality-api-{{env}}'
+    spec:
+      project: '{{project}}'
+      source:
+        repoURL: https://github.com/amohsenter09-github/weather-api-fastapi.git
+        targetRevision: master
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

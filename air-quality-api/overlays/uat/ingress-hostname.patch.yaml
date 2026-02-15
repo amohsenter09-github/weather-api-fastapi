@@ -1,13 +1,12 @@
 - op: replace
   path: /metadata/annotations/alb.ingress.kubernetes.io~1group.name
-  value: platform-dev
+  value: platform-uat
 - op: replace
   path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
-  value: origin-weather-dev.cloud-master-ai.com
+  value: origin-air-quality-uat.cloud-master-ai.com
 - op: add
   path: /metadata/annotations/alb.ingress.kubernetes.io~1group.order
-  value: "20"
+  value: "16"
 - op: replace
   path: /spec/rules/0/host
-  value: origin-weather-dev.cloud-master-ai.com
-
+  value: origin-air-quality-uat.cloud-master-ai.com
