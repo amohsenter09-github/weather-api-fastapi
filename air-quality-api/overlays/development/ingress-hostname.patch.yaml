@@ -2,6 +2,9 @@
   path: /metadata/annotations/alb.ingress.kubernetes.io~1group.name
   value: platform-dev
 - op: replace
+  path: /metadata/annotations/alb.ingress.kubernetes.io~1certificate-arn
+  value: arn:aws:acm:eu-west-1:918780499156:certificate/6b368fcf-bde3-4a5d-9815-fe2ced44053d
+- op: replace
   path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
   value: origin-air-quality-dev.cloud-master-ai.com
 - op: add
