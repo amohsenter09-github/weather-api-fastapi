@@ -2,7 +2,7 @@
 
 Weather API microservice built with FastAPI.
 
-Kubernetes manifests live in the sibling `kustomization-resources-applications` repo.
+Kubernetes manifests live in the sibling `kustomization-resources-applications` repo (`apps/weather-api`, image `weather-api:01`).
 
 ## Endpoints
 
@@ -34,8 +34,15 @@ Open the GUI at `http://localhost:8000/` and API docs at `http://localhost:8000/
 ## Docker
 
 ```bash
-docker build -t weather-api:local .
+docker build -t weather-api:01 .
 docker compose up --build
 ```
 
 Local host port: **8000** (`http://localhost:8000`).
+
+## Kubernetes
+
+```bash
+docker build -t weather-api:01 .
+kubectl apply -k ../kustomization-resources-applications/apps/weather-api/overlays/local
+```
