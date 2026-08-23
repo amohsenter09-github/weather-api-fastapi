@@ -8,21 +8,18 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 OVERLAYS=(
-  "api-fastapi/overlays/development"
-  "api-fastapi/overlays/uat"
-  "api-fastapi/overlays/production"
-  "air-quality-api/overlays/development"
-  "air-quality-api/overlays/uat"
-  "air-quality-api/overlays/production"
+  "k8s/overlays/local"
+  "k8s/overlays/cnpe-dev"
+  "k8s/overlays/cnpe-prod"
 )
 
 FAILED=0
 for overlay in "${OVERLAYS[@]}"; do
   echo "Building $overlay ..."
   if output=$(kustomize build "$overlay" 2>&1); then
-    echo "  ✓ $overlay OK"
+    echo "  OK $overlay"
   else
-    echo "  ✗ $overlay FAILED"
+    echo "  FAILED $overlay"
     echo "$output" | head -50
     FAILED=1
   fi

@@ -1,9 +1,0 @@
-- op: replace
-  path: /metadata/annotations/alb.ingress.kubernetes.io~1group.name
-  value: platform-prod
-- op: replace
-  path: /metadata/annotations/alb.ingress.kubernetes.io~1certificate-arn
-  value: arn:aws:acm:eu-west-1:918780499156:certificate/6e86af97-bc57-4bca-9615-f44b0571b870
-- op: add
-  path: /metadata/annotations/alb.ingress.kubernetes.io~1group.order
-  value: "11"
