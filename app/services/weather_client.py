@@ -35,6 +35,3 @@ class WeatherClient:
             resp = await client.get(url, params=params)
             resp.raise_for_status()
             return resp.json()
-
-
-

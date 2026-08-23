@@ -29,7 +29,7 @@ cp .env.example .env
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Open API docs at `http://localhost:8000/docs`.
+Open the GUI at `http://localhost:8000/` and API docs at `http://localhost:8000/docs`.
 
 ## Docker
 
@@ -37,3 +37,5 @@ Open API docs at `http://localhost:8000/docs`.
 docker build -t weather-api:local .
 docker compose up --build
 ```
+
+Local host port: **8000** (`http://localhost:8000`).

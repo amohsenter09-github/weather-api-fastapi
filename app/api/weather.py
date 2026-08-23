@@ -1,9 +1,20 @@
+import logging
+
+import httpx
 from fastapi import APIRouter, HTTPException, Query
 
 from app.core.config import get_settings
 from app.services.weather_client import WeatherClient
 
-router = APIRouter(prefix="", tags=["weather"])
+logger = logging.getLogger(__name__)
+router = APIRouter(tags=["weather"])
+
+
+def _normalize_city(city: str | None) -> str | None:
+    if city is None:
+        return None
+    city = city.strip()
+    return city or None
 
 
 @router.get("/weather")
@@ -12,6 +23,7 @@ async def get_weather(
     latitude: float | None = Query(default=None),
     longitude: float | None = Query(default=None),
 ):
+    city = _normalize_city(city)
     if city is None and (latitude is None or longitude is None):
         raise HTTPException(
             status_code=400,
@@ -24,24 +36,29 @@ async def get_weather(
     try:
         if city is not None:
             geo = await client.geocode_city(city)
-            latitude = float(geo["latitude"])
-            longitude = float(geo["longitude"])
+            resolved_lat = float(geo["latitude"])
+            resolved_lon = float(geo["longitude"])
             location = {
                 "name": geo.get("name"),
                 "country": geo.get("country"),
                 "admin1": geo.get("admin1"),
-                "latitude": latitude,
-                "longitude": longitude,
+                "latitude": resolved_lat,
+                "longitude": resolved_lon,
             }
         else:
-            location = {"latitude": latitude, "longitude": longitude}
+            resolved_lat = float(latitude)
+            resolved_lon = float(longitude)
+            location = {"latitude": resolved_lat, "longitude": resolved_lon}
 
-        data = await client.current_weather(latitude=latitude, longitude=longitude)  # type: ignore[arg-type]
-        return {"location": location, "current_weather": data.get("current_weather"), "raw": data}
+        data = await client.current_weather(latitude=resolved_lat, longitude=resolved_lon)
+        return {
+            "location": location,
+            "current_weather": data.get("current_weather"),
+        }
+    except HTTPException:
+        raise
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
-    except Exception as e:
+    except httpx.HTTPError as e:
+        logger.exception("Upstream weather provider error")
         raise HTTPException(status_code=502, detail="Upstream weather provider error") from e
-
-
-
