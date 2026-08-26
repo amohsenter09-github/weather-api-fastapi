@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="orange">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,9 +28,14 @@
         </label>
       </div>
       <button type="submit">Get weather</button>
+      <button id="save" type="button" class="secondary">Save place</button>
     </form>
     <p id="status" class="status" hidden></p>
     <section id="result" class="card" hidden></section>
+    <section id="places-wrap">
+      <h2>Saved places</h2>
+      <ul id="places" class="saved-list"></ul>
+    </section>
   </main>
   <script src="/static/app.js"></script>
 </body>

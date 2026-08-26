@@ -6,8 +6,15 @@ Kubernetes manifests live in the sibling `kustomization-resources-applications` 
 
 ## Endpoints
 
-- `GET /health` -> service health check
-- `GET /weather` -> current weather by city or coordinates
+- `GET /health` -> process up (does not need Postgres)
+- `GET /ready` -> Postgres reachable
+- `GET /weather` -> live Open-Meteo current weather (city or lat/lon)
+- `POST /places` -> save a place (`{"name":"Berlin","latitude":52.52,"longitude":13.41}` or `{"city":"Berlin"}`)
+- `GET /places` -> list saved places
+- `POST /places/{id}/refresh` -> fetch live weather and store an observation
+- `GET /places/{id}/history` -> last N snapshots
+- `POST /alerts` -> `{ "place_id", "metric":"temperature", "operator":"lt", "threshold":0 }`
+- `DELETE /places/{id}`
 
 ### `GET /weather` query params
 
@@ -31,14 +38,15 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Open the GUI at `http://localhost:8000/` and API docs at `http://localhost:8000/docs`.
 
+For `POST /places` and `GET /ready`, start Postgres first (`docker compose up postgres`).
+
 ## Docker
 
 ```bash
-docker build -t weather-api:01 .
 docker compose up --build
 ```
 
-Local host port: **8000** (`http://localhost:8000`).
+Local host port: **8000**. Postgres is on host **5434**.
 
 ## Kubernetes
 
