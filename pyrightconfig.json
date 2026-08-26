@@ -1,12 +1,13 @@
 {
   "include": ["app"],
+  "pythonVersion": "3.13",
+  "venvPath": ".",
+  "venv": ".venv",
   "executionEnvironments": [
     {
       "root": ".",
       "extraPaths": ["."]
     }
-  ],
-  "venvPath": ".",
-  "venv": ".venv"
+  ]
 }
 
