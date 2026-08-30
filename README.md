@@ -8,12 +8,13 @@ Kubernetes manifests live in the sibling `kustomization-resources-applications` 
 
 - `GET /health` -> process up (does not need Postgres)
 - `GET /ready` -> Postgres reachable
-- `GET /weather` -> live Open-Meteo current weather (city or lat/lon)
+- `GET /weather` -> live Open-Meteo current weather plus 24 hourly and 7-day forecast (city or lat/lon)
 - `POST /places` -> save a place (`{"name":"Berlin","latitude":52.52,"longitude":13.41}` or `{"city":"Berlin"}`)
 - `GET /places` -> list saved places
 - `POST /places/{id}/refresh` -> fetch live weather and store an observation
 - `GET /places/{id}/history` -> last N snapshots
 - `POST /alerts` -> `{ "place_id", "metric":"temperature", "operator":"lt", "threshold":0 }`
+- `GET /alerts/evaluate?latitude=&longitude=` -> triggered alerts for saved places within 5 km
 - `DELETE /places/{id}`
 
 ### `GET /weather` query params

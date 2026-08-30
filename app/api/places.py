@@ -1,4 +1,6 @@
 import logging
+import math
+from types import SimpleNamespace
 from uuid import UUID
 
 import httpx
@@ -10,6 +12,7 @@ from app.api.schemas import (
     AlertCreate,
     AlertList,
     AlertOut,
+    EvaluateOut,
     ObservationList,
     ObservationOut,
     PlaceCreate,
@@ -179,3 +182,45 @@ async def create_alert(body: AlertCreate, session: AsyncSession = Depends(get_se
 async def list_alerts(session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(Alert).order_by(Alert.created_at.desc()))
     return AlertList(alerts=list(result.scalars().all()))
+
+
+def _distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    rlat1, rlon1, rlat2, rlon2 = map(math.radians, (lat1, lon1, lat2, lon2))
+    dlat = rlat2 - rlat1
+    dlon = rlon2 - rlon1
+    a = math.sin(dlat / 2) ** 2 + math.cos(rlat1) * math.cos(rlat2) * math.sin(dlon / 2) ** 2
+    return 2 * 6371000 * math.asin(min(1.0, math.sqrt(a)))
+
+
+@router.get("/alerts/evaluate", response_model=EvaluateOut)
+async def evaluate_alerts(
+    latitude: float = Query(...),
+    longitude: float = Query(...),
+    radius_m: float = Query(default=5000, ge=100, le=50000),
+    session: AsyncSession = Depends(get_session),
+):
+    settings = get_settings()
+    try:
+        data = await WeatherClient(settings).current_weather(latitude, longitude)
+    except httpx.HTTPError as e:
+        logger.exception("Upstream weather provider error")
+        raise HTTPException(status_code=502, detail="Upstream weather provider error") from e
+    current = data.get("current_weather") or {}
+    obs = SimpleNamespace(
+        temperature=current.get("temperature"),
+        windspeed=current.get("windspeed"),
+        weathercode=current.get("weathercode"),
+    )
+    places = list((await session.execute(select(Place))).scalars().all())
+    nearby = [place for place in places if _distance_m(latitude, longitude, place.latitude, place.longitude) <= radius_m]
+    nearby_ids = {place.id for place in nearby}
+    alerts = list((await session.execute(select(Alert).where(Alert.enabled.is_(True)))).scalars().all())
+    triggered = []
+    for alert in alerts:
+        if alert.place_id not in nearby_ids:
+            continue
+        item = AlertOut.model_validate(alert)
+        item.triggered = _alert_triggered(alert, obs)
+        if item.triggered:
+            triggered.append(item)
+    return EvaluateOut(current_weather=current, triggered_alerts=triggered, nearby_places=nearby)

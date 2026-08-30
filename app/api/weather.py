@@ -51,9 +51,12 @@ async def get_weather(
             location = {"latitude": resolved_lat, "longitude": resolved_lon}
 
         data = await client.current_weather(latitude=resolved_lat, longitude=resolved_lon)
+        forecast = client.compact_forecast(data)
         return {
             "location": location,
             "current_weather": data.get("current_weather"),
+            "hourly": forecast["hourly"],
+            "daily": forecast["daily"],
         }
     except HTTPException:
         raise

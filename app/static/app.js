@@ -13,6 +13,7 @@ const codes = {
 
 const form = document.getElementById("form");
 const saveBtn = document.getElementById("save");
+const locateBtn = document.getElementById("locate");
 const statusEl = document.getElementById("status");
 const result = document.getElementById("result");
 const placesEl = document.getElementById("places");
@@ -22,6 +23,43 @@ function showError(message) {
   statusEl.hidden = false;
   statusEl.className = "status error";
   statusEl.textContent = message;
+}
+
+function hourLabel(iso) {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso.slice(11, 16);
+  return date.toLocaleTimeString([], { hour: "2-digit" });
+}
+
+function dayLabel(iso) {
+  if (!iso) return "";
+  const date = new Date(`${iso}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+}
+
+function renderForecast(data) {
+  const hours = (data.hourly || []).slice(0, 12);
+  const days = data.daily || [];
+  const hourly = hours.map((row) => `
+    <div class="stat">
+      <span>${hourLabel(row.time)}</span>
+      <strong>${row.temperature ?? "–"}°</strong>
+      <span>${row.precipitation_probability ?? "–"}% rain</span>
+    </div>
+  `).join("");
+  const daily = days.map((row) => `
+    <div class="stat">
+      <span>${dayLabel(row.date)}</span>
+      <strong>${row.temperature_min ?? "–"}° / ${row.temperature_max ?? "–"}°</strong>
+      <span>${codes[row.weathercode] || "Forecast"} · ${row.precipitation_probability_max ?? "–"}%</span>
+    </div>
+  `).join("");
+  return `
+    ${hourly ? `<p class="meta">Next 12 hours</p><div class="grid forecast">${hourly}</div>` : ""}
+    ${daily ? `<p class="meta">7-day</p><div class="grid forecast">${daily}</div>` : ""}
+  `;
 }
 
 function renderWeather(data) {
@@ -36,8 +74,17 @@ function renderWeather(data) {
       <div class="stat"><span>Wind</span><strong>${weather.windspeed ?? "–"} km/h</strong></div>
       <div class="stat"><span>Direction</span><strong>${weather.winddirection ?? "–"}°</strong></div>
     </div>
+    ${renderForecast(data)}
   `;
   result.hidden = false;
+}
+
+async function checkNearbyAlerts(lat, lon) {
+  const resp = await fetch(`/alerts/evaluate?latitude=${lat}&longitude=${lon}`);
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok || !data.triggered_alerts?.length) return;
+  const lines = data.triggered_alerts.map((alert) => `${alert.metric} ${alert.operator} ${alert.threshold}`).join(", ");
+  showError(`Nearby alert: ${lines}`);
 }
 
 async function loadPlaces() {
@@ -66,6 +113,7 @@ async function loadPlaces() {
         if (!weatherResp.ok) throw new Error(weatherData.detail || "Weather failed");
         lastLocation = place;
         renderWeather(weatherData);
+        await checkNearbyAlerts(place.latitude, place.longitude);
         const histResp = await fetch(`/places/${place.id}/history?limit=5`);
         const hist = await histResp.json();
         if (histResp.ok && hist.observations?.length) {
@@ -123,6 +171,9 @@ form.addEventListener("submit", async (event) => {
     };
     renderWeather(data);
     statusEl.hidden = true;
+    if (data.location?.latitude != null) {
+      await checkNearbyAlerts(data.location.latitude, data.location.longitude);
+    }
   } catch (error) {
     showError(error.message);
   }
@@ -152,6 +203,31 @@ saveBtn.addEventListener("click", async () => {
   } catch (error) {
     showError(error.message);
   }
+});
+
+locateBtn.addEventListener("click", () => {
+  if (!navigator.geolocation) return showError("Geolocation is not available");
+  statusEl.hidden = false;
+  statusEl.className = "status";
+  statusEl.textContent = "Locating…";
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      document.getElementById("latitude").value = lat;
+      document.getElementById("longitude").value = lon;
+      document.getElementById("city").value = "";
+      const response = await fetch(`/weather?latitude=${lat}&longitude=${lon}`);
+      const data = await response.json();
+      if (!response.ok) return showError(data.detail || "Weather failed");
+      lastLocation = { name: "My location", latitude: lat, longitude: lon };
+      renderWeather(data);
+      statusEl.hidden = true;
+      await checkNearbyAlerts(lat, lon);
+    },
+    () => showError("Could not read your location"),
+    { enableHighAccuracy: true, timeout: 10000 },
+  );
 });
 
 loadPlaces();

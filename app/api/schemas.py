@@ -75,3 +75,9 @@ class AlertList(BaseModel):
 class RefreshOut(BaseModel):
     observation: ObservationOut
     triggered_alerts: list[AlertOut]
+
+
+class EvaluateOut(BaseModel):
+    current_weather: dict
+    triggered_alerts: list[AlertOut]
+    nearby_places: list[PlaceOut]
