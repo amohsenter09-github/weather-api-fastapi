@@ -1,57 +1,59 @@
 # weather-api-fastapi
 
-Weather API microservice built with FastAPI.
+Sample FastAPI workload used to exercise the delivery platform. This is not a production weather product. The same image is what GitOps deploys to `workload-dev` and `workload-prod`.
 
-Kubernetes manifests live in the sibling `kustomization-resources-applications` repo (`apps/weather-api`, image `weather-api:01`).
+Current conditions, 24-hour and 7-day forecast, saved places, and nearby alert evaluation.
+
+## Role in the platform
+
+| Piece | Repo |
+| --- | --- |
+| This app + Dockerfile | [weather-api-fastapi](https://github.com/amohsenter09-github/weather-api-fastapi) |
+| Kustomize base + overlays | [kustomization-resources-applications](https://github.com/amohsenter09-github/kustomization-resources-applications) (`apps/weather-api`) |
+| Argo CD Application | [bootstrap-control-plane](https://github.com/amohsenter09-github/bootstrap-control-plane) (`app-weather-dev`, `app-weather-prod`) |
+| Cluster, registry, DNS | [scaleway-infrastructure](https://github.com/amohsenter09-github/scaleway-infrastructure) |
+
+Image Updater watches `rg.fr-par.scw.cloud/cnpe/weather-api:02`.
+
+**Scaleway URLs:** https://weather-api.cnpe-dev.cloud-master-ai.com · https://weather-api.cnpe-prod.cloud-master-ai.com
+
+## Implementation
+
+- FastAPI + SQLAlchemy async + PostgreSQL
+- Static UI at `/`; “Use my location” fills lat/lon
+- Open-Meteo for current, hourly, and daily forecast
+- Saved alerts (`metric` + `operator` + `threshold`); `GET /alerts/evaluate` returns matches within 5 km
 
 ## Endpoints
 
-- `GET /health` -> process up (does not need Postgres)
-- `GET /ready` -> Postgres reachable
-- `GET /weather` -> live Open-Meteo current weather plus 24 hourly and 7-day forecast (city or lat/lon)
-- `POST /places` -> save a place (`{"name":"Berlin","latitude":52.52,"longitude":13.41}` or `{"city":"Berlin"}`)
-- `GET /places` -> list saved places
-- `POST /places/{id}/refresh` -> fetch live weather and store an observation
-- `GET /places/{id}/history` -> last N snapshots
-- `POST /alerts` -> `{ "place_id", "metric":"temperature", "operator":"lt", "threshold":0 }`
-- `GET /alerts/evaluate?latitude=&longitude=` -> triggered alerts for saved places within 5 km
-- `DELETE /places/{id}`
+- `GET /health` — process up (no Postgres)
+- `GET /ready` — Postgres reachable
+- `GET /weather` — current + 24 hourly + 7-day (`city` or `latitude`+`longitude`)
+- `POST /places` · `GET /places` · `DELETE /places/{id}`
+- `POST /places/{id}/refresh` · `GET /places/{id}/history`
+- `POST /alerts` — `{ "place_id", "metric":"temperature", "operator":"lt", "threshold":0 }`
+- `GET /alerts/evaluate?latitude=&longitude=`
 
-### `GET /weather` query params
-
-- `city` (string) OR
-- `latitude` (float) + `longitude` (float)
-
-Example:
-
-- `GET /weather?city=Berlin`
-- `GET /weather?latitude=52.52&longitude=13.41`
-
-## Local dev (venv)
+## Local
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
+docker compose up postgres
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Open the GUI at `http://localhost:8000/` and API docs at `http://localhost:8000/docs`.
+UI: http://localhost:8000/ · docs: http://localhost:8000/docs
 
-For `POST /places` and `GET /ready`, start Postgres first (`docker compose up postgres`).
+Or `docker compose up --build` (API **8000**, Postgres host **5434**).
 
-## Docker
-
-```bash
-docker compose up --build
-```
-
-Local host port: **8000**. Postgres is on host **5434**.
-
-## Kubernetes
+## Image for Kapsule
 
 ```bash
-docker build -t weather-api:01 .
-kubectl apply -k ../kustomization-resources-applications/apps/weather-api/overlays/local
+docker buildx build --platform linux/amd64 --provenance=false --sbom=false \
+  -t rg.fr-par.scw.cloud/cnpe/weather-api:02 --push .
 ```
+
+Kind local overlay still uses `weather-api:01`.
